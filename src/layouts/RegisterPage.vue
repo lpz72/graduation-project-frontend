@@ -24,23 +24,23 @@
         </a-input-password>
       </a-form-item>
       <a-form-item
+        label="确认密码"
+        name="checkPassword"
+        :rules="[{ required: true, message: '请再次输入密码!' }]"
+      >
+        <a-input-password v-model:value="formState.checkPassword">
+        </a-input-password>
+      </a-form-item>
+      <a-form-item
         label="用户身份"
         name="role"
         :rules="[{ required: true, message: '请选择你的身份!' }]"
       >
         <a-select v-model:value="formState.role" placeholder="请选择你的身份">
-          <a-select-option value="0">管理员</a-select-option>
           <a-select-option value="1">老人</a-select-option>
           <a-select-option value="2">护士</a-select-option>
           <a-select-option value="3">医生</a-select-option>
         </a-select>
-      </a-form-item>
-
-      <a-form-item>
-        <a-form-item name="remember" no-style>
-          <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
-        </a-form-item>
-        <a class="login-form-forgot" href="">忘记密码</a>
       </a-form-item>
 
       <a-form-item>
@@ -50,9 +50,8 @@
           html-type="submit"
           class="login-form-button"
         >
-          登 录
+          立即注册
         </a-button>
-        <a href="/user/register">立即注册!</a>
       </a-form-item>
     </a-form>
   </div>
@@ -60,24 +59,49 @@
 
 <script setup lang="ts">
 import { reactive, computed } from "vue";
+import myAxios from "@/plugins/myAxios";
+import { message } from "ant-design-vue";
+import { useRouter } from "vue-router";
 interface FormState {
   userAccount: string;
   userPassword: string;
-  role: number;
-  remember: boolean;
+  checkPassword: string;
+  role: string;
 }
 
 const formState = reactive<FormState>({
   userAccount: "",
   userPassword: "",
-  role: undefined,
-  remember: true,
+  checkPassword: "",
+  role: "",
 });
 /**
  * 提交表单
  */
+const router = useRouter();
 const handleSubmit = async () => {
   console.log(formState.role);
+  const res = await myAxios.post("/user/register",
+    {
+      userAccount: formState.userAccount,
+      userPassword: formState.userPassword,
+      checkPassword: formState.checkPassword,
+      userRole: Number(formState.role),
+  });
+  console.log(formState);
+  if (res.code === 0 && res.data) {
+    message.success("注册成功!");
+    // window.location.href = "/register";
+    await router.push({
+      path: '/',
+      replace: true,
+    });
+  } else {
+    // console.log(res.code);
+    // message.error(res.message);
+    message.error(res.description);
+  }
+
 };
 </script>
 

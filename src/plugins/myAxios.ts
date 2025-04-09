@@ -31,7 +31,7 @@ myAxios.interceptors.response.use(
     //如果没登录，则跳转到登录页,登录后跳转到之前的页面
     if (response.data.code === 40100) {
       const redirectUrl = window.location.href;
-      window.location.href = "/older/login?redirect=" + redirectUrl;
+      window.location.href = "/?redirect=" + redirectUrl;
     }
 
     console.log("我收到你的响应了", response);

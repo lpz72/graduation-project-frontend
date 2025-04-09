@@ -1,10 +1,13 @@
 <template>
-  <router-view />
+就诊记录页面
 </template>
 
 <script setup lang="ts">
+
 </script>
 
-<style>
+
+
+<style scoped>
 
 </style>
