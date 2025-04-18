@@ -5,5 +5,4 @@ import "ant-design-vue/dist/reset.css";
 import router from "@/config/route";
 
 const app = createApp(App);
-
 app.use(router).use(Antd).mount("#app");

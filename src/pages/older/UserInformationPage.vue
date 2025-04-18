@@ -20,7 +20,7 @@
             name="gender"
             :rules="[{ required: true, message: '请选择你的性别!' }]"
           >
-        <a-select v-model:value="gender" placeholder="请选择你的性别" style="width: 200px">
+        <a-select v-model:value="form.gender" placeholder="请选择你的性别" style="width: 200px">
           <a-select-option value="0">男</a-select-option>
           <a-select-option value="1">女</a-select-option>
         </a-select>
@@ -45,15 +45,7 @@
         <a-input :disabled="true" v-model:value="form.userAccount">{{form.userAccount ?? "请输入账号!"}} </a-input>
       </a-form-item>
 
-      <a-form-item
-        label="密码"
-        name="userPassword"
-        :rules="[{ required: true, message: '请输入密码!' }]"
-      >
-        <a-input-password v-model:value="form.userPassword">
-          {{form.userPassword ?? "请输入密码!"}}
-        </a-input-password>
-      </a-form-item>
+
       <a-form-item
         label="年龄"
         name="age"
@@ -99,6 +91,15 @@
           {{form.lowBloodPressure ?? "请输入血压低压(mmHg)!"}}
         </a-input>
       </a-form-item>
+      <a-form-item
+        label="联系电话"
+        name="phone"
+        :rules="[{ required: true, message: '请输入联系电话!' }]"
+      >
+        <a-input v-model:value="form.phone">
+          {{form.phone ?? "请输入联系电话!"}}
+        </a-input>
+      </a-form-item>
       <a-form-item>
         <a-button
           :disabled="disabled"
@@ -114,6 +115,16 @@
 </template>
 
 <script setup lang="ts">
+// <a-form-item
+// label="密码"
+// name="userPassword"
+// :rules="[{ required: true, message: '请输入密码!' }]"
+//   >
+//   <a-input-password v-model:value="form.userPassword">
+//   {{form.userPassword ?? "请输入密码!"}}
+// </a-input-password>
+// </a-form-item>
+
 import { reactive, computed, ref, onMounted, toRefs } from "vue";
 import myAxios from "@/plugins/myAxios";
 import { FormInstance, message } from "ant-design-vue";
@@ -131,12 +142,13 @@ const form = ref({
   gender: "",
   idNumber: "",
   userAccount: "",
-  userPassword: loginUser.value?.userPassword,
+  userPassword: "",
   age: undefined,
   weight: undefined,
   height: undefined,
   highBloodPressure: undefined,
   lowBloodPressure: undefined,
+  phone: "",
 
 })
 
@@ -173,6 +185,7 @@ onMounted(async () => {
       idNumber: loginUser.value?.idNumber,
       userAccount: loginUser.value?.userAccount,
       userPassword: loginUser.value?.userPassword,
+      phone: loginUser.value?.phone,
       age: loginUser.value?.age,
       weight: information.value?.weight,
       height: information.value?.height,
@@ -180,6 +193,11 @@ onMounted(async () => {
       lowBloodPressure: information.value?.lowBloodPressure,
     })
     form.value = Data.value;
+    if (form.value?.gender === '0') {
+      form.value.gender = '男';
+    } else {
+      form.value.gender = '女';
+    }
 
   }
 })
@@ -190,17 +208,14 @@ onMounted(async () => {
 const handleSubmit = async () => {
 
   if(loginUser.value) {
-    if (gender.value === "男") {
-      loginUser.value.gender = 1;
-    } else if (gender.value === "女") {
-      loginUser.value.gender = 2;
-    } else loginUser.value.gender = gender.value;
+    loginUser.value.gender = Number(form.value.gender);
 
     loginUser.value.username = String(form.value.username);
     loginUser.value.userAccount = String(form.value.userAccount);
     loginUser.value.userPassword = String(form.value.userPassword);
     loginUser.value.age = Number(form.value.age);
     loginUser.value.idNumber = String(form.value.idNumber);
+    loginUser.value.phone = String(form.value.phone);
   }
 
   if (information.value) {
@@ -226,7 +241,7 @@ const handleSubmit = async () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
 #userInformationPage .login-form {

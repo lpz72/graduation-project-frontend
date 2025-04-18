@@ -1,5 +1,5 @@
 <template>
-  <div class="news-list-container">
+  <div class="news-list-container" v-if="news.length > 0">
     <div>
       <img src="../../assets/健康资讯.png" style="width: 100%;height: 100px;margin-bottom: 20px">
     </div>
@@ -14,7 +14,10 @@
         <template #header>
           <div style="display: flex;width: 100%;align-items: center;">
             <a>{{item.title}}</a>
-            <span style="margin-left: auto;margin-right: 10px">作者: {{ item.author }}</span>
+            <span style="margin-left: auto;margin-right: 10px">
+              <a-tag color="blue">作者: {{item.author}}</a-tag>
+              <a-tag color="purple">阅读量: {{item.readCount}}</a-tag>
+            </span>
           </div>
         </template>
         <a-card hoverable class="news-card">
@@ -35,6 +38,7 @@
       </a-collapse-panel>
     </a-collapse>
   </div>
+  <a-empty  v-if="news.length === 0" :image="simpleImage" description="暂无数据" style="margin-top: 100px" />
 </template>
 
 <script setup lang="ts">
@@ -43,6 +47,8 @@ import myAxios from '@/plugins/myAxios';
 import { message } from "ant-design-vue";
 import { marked } from "marked";
 import { toFormData } from "axios";
+import { Empty } from 'ant-design-vue';
+const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
 const news = ref([]);
 const activeKey = ref('');

@@ -19,5 +19,7 @@ export type UserType = {
   isDelete: number;
   createTime: Date;
   updateTime: Date;
+  specialty: string;
+  hospital: string;
 };
 

@@ -23,16 +23,36 @@
           <ProfileOutlined />
           <span>体检记录</span>
         </a-menu-item>
-        <a-menu-item key="5">
-          <router-link to="/user/appointment" />
-          <ScheduleOutlined />
-          <span>预约信息</span>
-        </a-menu-item>
-        <a-menu-item key="6">
-          <router-link to="/user/activities" />
-          <NotificationOutlined />
-          <span>活动信息</span>
-        </a-menu-item>
+        <a-sub-menu key="5" title="预约信息">
+          <template #icon>
+            <ScheduleOutlined />
+          </template>
+            <a-menu-item key="8">
+              <router-link to="/user/appointment/doctor" />
+              <ScheduleOutlined />
+              <span>预约挂号</span>
+            </a-menu-item>
+            <a-menu-item key="9">
+              <router-link to="/user/appointment/history" />
+              <ScheduleOutlined />
+              <span>预约记录</span>
+            </a-menu-item>
+        </a-sub-menu>
+        <a-sub-menu key="6" title="活动信息">
+          <template #icon>
+            <NotificationOutlined />
+          </template>
+          <a-menu-item key="10">
+            <router-link to="/user/activities/join" />
+            <NotificationOutlined />
+            <span>参加活动</span>
+          </a-menu-item>
+          <a-menu-item key="11">
+            <router-link to="/user/activities/history" />
+            <NotificationOutlined />
+            <span>已报名活动</span>
+          </a-menu-item>
+        </a-sub-menu>
         <a-menu-item key="7">
           <router-link to="/user/emergency" />
           <AlertOutlined />
@@ -91,18 +111,39 @@ import {
 } from '@ant-design/icons-vue';
 import myAxios from "@/plugins/myAxios";
 import { message } from "ant-design-vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
-const selectedKeys = ref<string[]>(['1']);
+const selectedKeys = ref<string[]>([]);
 const collapsed = ref<boolean>(false);
 const router = useRouter();
+const route = useRoute();
 
 const loginUser = ref<UserType>();
 
+const routeToKeyMap = {
+  '/user/information': '1',
+  '/user/news': '2',
+  '/user/record': '3',
+  '/user/check': '4',
+  '/user/appointment': '5',
+  '/user/activities': '6',
+  '/user/emergency': '7',
+  '/user/appointment/doctor': '8',
+  '/user/appointment/history': '9',
+  '/user/activities/join': '10',
+  '/user/activities/history': '11',
+} as const;
+type RoutePath = keyof typeof routeToKeyMap; //指定其类型
+
 onMounted(async () => {
   loginUser.value = await getCurrentUser();
-  console.log(loginUser.value);
+  // console.log("网址：",route.path);
+  await router.push(route.path);
+  const path = route.path as RoutePath; //进行类型断言
+  const matchedKey = routeToKeyMap[path] || '1';
+  selectedKeys.value = [matchedKey];
+  // console.log(loginUser.value);
 })
 
 
