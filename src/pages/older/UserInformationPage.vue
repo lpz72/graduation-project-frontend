@@ -100,6 +100,15 @@
           {{form.phone ?? "请输入联系电话!"}}
         </a-input>
       </a-form-item>
+      <a-form-item
+        label="家庭住址"
+        name="address"
+        :rules="[{ required: true, message: '请输入家庭住址!' }]"
+      >
+        <a-input v-model:value="form.address">
+          {{form.address ?? "请输入联系电话!"}}
+        </a-input>
+      </a-form-item>
       <a-form-item>
         <a-button
           :disabled="disabled"
@@ -149,6 +158,7 @@ const form = ref({
   highBloodPressure: undefined,
   lowBloodPressure: undefined,
   phone: "",
+  address: "",
 
 })
 
@@ -184,8 +194,8 @@ onMounted(async () => {
       gender: loginUser.value?.gender,
       idNumber: loginUser.value?.idNumber,
       userAccount: loginUser.value?.userAccount,
-      userPassword: loginUser.value?.userPassword,
       phone: loginUser.value?.phone,
+      address: loginUser.value?.address,
       age: loginUser.value?.age,
       weight: information.value?.weight,
       height: information.value?.height,
@@ -193,6 +203,7 @@ onMounted(async () => {
       lowBloodPressure: information.value?.lowBloodPressure,
     })
     form.value = Data.value;
+    console.log("form:",form.value);
     if (form.value?.gender === '0') {
       form.value.gender = '男';
     } else {
@@ -212,10 +223,10 @@ const handleSubmit = async () => {
 
     loginUser.value.username = String(form.value.username);
     loginUser.value.userAccount = String(form.value.userAccount);
-    loginUser.value.userPassword = String(form.value.userPassword);
     loginUser.value.age = Number(form.value.age);
     loginUser.value.idNumber = String(form.value.idNumber);
     loginUser.value.phone = String(form.value.phone);
+    loginUser.value.address = String(form.value.address);
   }
 
   if (information.value) {

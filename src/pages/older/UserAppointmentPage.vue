@@ -5,7 +5,7 @@
       :size="size"
       style="width: 300px"
       placeholder="请选择科室"
-      :options="options"
+      :options="departments"
     ></a-select>
     <span style="margin-left: 10px">
       <a-date-picker v-model:value="time"  :disabled-date="disabledDate"/>
@@ -66,14 +66,14 @@
         :columns="scheduleColumns"
         :data-source="selectedDoctor.schedule"
         :pagination="false"
-        row-key="id"
+        row-key="record => record.id"
         :loading="loadingSchedules"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'action'">
-            <a-button v-if="record.isAppointment === 0" type="primary" size="small" @click="showModal">预约</a-button>
+            <a-button v-if="record.isAppointment === 0" type="primary" size="small" @click="showModal(record)">预约</a-button>
             <a-button v-if="record.isAppointment === 1" type="primary" size="small" >已预约</a-button>
-            <a-modal v-model:open="open" title="是否确认预约" @ok="handleAppointment(record,selectedDoctor)">
+            <a-modal v-model:open="open" title="是否确认预约" @ok="handleAppointment(currentRecord,selectedDoctor)">
             </a-modal>
           </template>
         </template>
@@ -96,6 +96,7 @@ import manAvatar from "@/assets/男医生.png";
 import womenAvatar from "@/assets/女医生.png";
 import { getCurrentUser } from "@/services/user";
 import { UserType } from "@/models/user";
+import { departments } from "@/constants/departments";
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
@@ -103,11 +104,8 @@ const value1 = ref();
 const value2 = ref();
 const time = ref<Dayjs>();
 let selectTime = ref();
+const currentRecord = ref();
 
-const options = ref<SelectProps['options']>([
-  {value: '皮肤科',label: '皮肤科'},
-  {value: '疼痛科',label: '疼痛科'},
-])
 const options2 = ref<SelectProps['options']>([
   {value: '0',label: '医生'},
   {value: '1',label: '护士'},
@@ -192,7 +190,7 @@ const getSchedule = async (val:string,date:Dayjs,val2:number) => {
 
       const sortedSchedules = doctor.schedule.filter(Boolean).sort((a, b) => {
         //使用 localeCompare 方法比较字符串，以确保按时间顺序排列。
-        return (a.timeRange ?? '') .localeCompare(b.timeRange ?? '');
+        return (a.startTime ?? '') .localeCompare(b.startTime ?? '');
       });
 
       sortedSchedules.forEach(schedule => {
@@ -203,6 +201,7 @@ const getSchedule = async (val:string,date:Dayjs,val2:number) => {
           isAppointment: 0, //0：预约 1：已预约
           numberType: schedule.numberType,
           peopleCount: schedule.peopleCount,
+          way: schedule.way,
           fee: schedule.fee,
         });
       });
@@ -223,6 +222,7 @@ const scheduleColumns = [
   { title: '号源类型', dataIndex: 'numberType', key: 'numberType' },
   { title: '剩余号数', dataIndex: 'peopleCount', key: 'peopleCount' },
   { title: '费用', dataIndex: 'fee', key: 'fee' },
+  { title: '服务类型', dataIndex: 'way', key: 'way' },
   { title: '操作', key: 'action' }
 ];
 
@@ -266,7 +266,8 @@ const showSchedule = async (doctor) => {
  * 展示预约确认
  */
 const open = ref(false);
-const showModal = () => {
+const showModal = (record) => {
+  currentRecord.value = record;
   open.value = true;
 };
 
@@ -286,6 +287,7 @@ const handleAppointment = async (schedule, doctor) => {
   const time = String(schedule.startTime).substring(0,10) + " " + schedule.timeRange;
   const res = await myAxios.post('/appointment/add', {
     userId: loginUser.value?.id,
+    workerId: doctor.id,
     scheduleId: schedule.id,
     username: loginUser.value?.username,
     idNumber: loginUser.value?.idNumber,
@@ -293,6 +295,7 @@ const handleAppointment = async (schedule, doctor) => {
     workerName: doctor.username,
     time: time,
     type: 0, //0表示已预约 1：表示退号
+    way: schedule.way,
     department: doctor.department,
     timeRange: schedule.timeRange,
     category: doctor.type,

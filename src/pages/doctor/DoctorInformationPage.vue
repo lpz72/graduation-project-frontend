@@ -1,6 +1,6 @@
 <template>
   <div id="nurseInformationPage">
-<!-- 必须先声明loginUser，否则vue不知道loginUser是什么  -->
+    <!-- 必须先声明loginUser，否则vue不知道loginUser是什么  -->
     <a-form
       v-if="loginUser"
       :model="loginUser"

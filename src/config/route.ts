@@ -19,9 +19,16 @@ import NurseInformationPage from "@/pages/nurse/NurseInformationPage.vue";
 import NurseSchedulePage from "@/pages/nurse/NurseSchedulePage.vue";
 import NurseAppointmentPage from "@/pages/nurse/NurseAppointmentPage.vue";
 import NurseRecordPage from "@/pages/nurse/NurseRecordPage.vue";
+import DoctorInformationPage from "@/pages/doctor/DoctorInformationPage.vue";
+import DoctorSchedulePage from "@/pages/doctor/DoctorSchedulePage.vue";
+import DoctorAppointmentPage from "@/pages/doctor/DoctorAppointmentPage.vue";
+import DoctorEditCheckRecordPage from "@/pages/doctor/DoctorEditCheckRecordPage.vue";
+import DoctorSelectCheckRecordPage from "@/pages/doctor/DoctorSelectCheckRecordPage.vue";
+import DoctorEditMedicalRecordPage from "@/pages/doctor/DoctorEditMedicalRecordPage.vue";
+import DoctorEmergencyHistoryPage from "@/pages/doctor/DoctorEmergencyHistoryPage.vue";
 
 //定义一些路由
-
+//name相当于key，不能重复
 const routes: Array<RouteRecordRaw> = [
     { path: '/', name: "首页登录", component: LoginPage }, //默认路由
     { path: '/register',name: "注册", component: RegisterPage},
@@ -45,8 +52,21 @@ const routes: Array<RouteRecordRaw> = [
         { path: '/nurse/schedule', name: "护士排班信息页面", component: NurseSchedulePage},
         { path: '/nurse/appointment', name: "护士预约信息页面", component: NurseAppointmentPage},
         { path: '/nurse/record', name: "护士护理记录页面", component: NurseRecordPage},
+        { path: '/nurse/activities/join', name: "护士所有活动页面", component: UserActivitiesPage},
+        { path: '/nurse/activities/history', name: "护士已参加活动页面", component: UserActivitiesHistoryPage},
     ]},
-    { path: '/doctor', name: "医生首页", component: DoctorHomePage},
+    { path: '/doctor', name: "医生首页", component: DoctorHomePage,
+    children: [
+        { path: '/doctor/information', name: "医生个人信息页面", component: DoctorInformationPage},
+        { path: '/doctor/schedule', name: "医生排班信息页面", component: DoctorSchedulePage},
+        { path: '/doctor/appointment', name: "医生预约信息页面", component: DoctorAppointmentPage},
+        { path: '/doctor/record/upload', name: "医生上传病人体检报告页面", component: DoctorEditCheckRecordPage},
+        { path: '/doctor/record/history', name: "医生查询病人体检报告页面", component: DoctorSelectCheckRecordPage},
+        { path: '/doctor/medical/upload', name: "医生上传病人就诊信息页面", component: DoctorEditMedicalRecordPage},
+        { path: '/doctor/activities/join', name: "医生所有活动页面", component: UserActivitiesPage},
+        { path: '/doctor/activities/history', name: "医生已参加活动页面", component: UserActivitiesHistoryPage},
+        { path: '/doctor/emergency/history', name: "医生收到的紧急呼救记录页面", component: DoctorEmergencyHistoryPage},
+    ]},
 
 ]
 const router = createRouter({

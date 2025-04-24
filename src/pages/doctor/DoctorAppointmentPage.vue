@@ -12,6 +12,16 @@
     <!--    展示排班信息 -->
     <div class="nurse-schedule">
       <a-table :columns="columns" :data-source="data">
+        <template #bodyCell="{column,record}">
+          <template v-if="column.key === 'action'">
+            <a-button type="link" @click="toEdit(record)">
+              <template #icon>
+                <edit-outlined />
+              </template>
+              上传/修改就诊报告
+            </a-button>
+          </template>
+        </template>
       </a-table>
     </div>
   </div>
@@ -25,6 +35,8 @@ import myAxios from "@/plugins/myAxios";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
 import { message } from "ant-design-vue";
+import { EditOutlined } from "@ant-design/icons-vue";
+import { useRouter } from "vue-router";
 
 const time = ref<Dayjs>();
 
@@ -44,16 +56,15 @@ const columns = [
     dataIndex: 'department',
     key: 'department',
   },
-
   {
     title: '预约时间段',
     dataIndex: 'time',
     key: 'time',
   },
   {
-    title: '预约服务类型',
-    dataIndex: 'way',
-    key: 'way',
+    title: '操作',
+    dataIndex: 'action',
+    key: 'action',
   },
 ];
 
@@ -67,8 +78,18 @@ onMounted(async () => {
 
 });
 
+const router = useRouter();
+const toEdit = async (record) => {
+    await router.push({
+      path: '/doctor/medical/upload',
+      query: {
+        data: JSON.stringify(record), //传的是个对象，随意需转换成json对象
+      }
+    });
+}
+
 /**
- * 获取该护士的所有预约信息
+ * 获取该护士或医生的所有预约信息
  */
 const select = async () => {
   const res = await myAxios.get("/appointment/worker",{

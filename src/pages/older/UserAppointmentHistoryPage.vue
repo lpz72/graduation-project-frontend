@@ -52,9 +52,14 @@ const columns = [
     key: 'time',
   },
   {
-    title: '类别',
+    title: '医护人员',
     dataIndex: 'category',
     key: 'category',
+  },
+  {
+    title: '服务类型',
+    dataIndex: 'way',
+    key: 'way',
   },
   {
     title: '操作',

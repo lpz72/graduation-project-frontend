@@ -43,7 +43,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import {
   TeamOutlined,
@@ -51,31 +51,50 @@ import {
 } from '@ant-design/icons-vue';
 import myAxios from "@/plugins/myAxios";
 import { message } from "ant-design-vue";
+import { getCurrentUser } from "@/services/user";
+import { UserType } from "@/models/user";
 
 const open = ref(false);
 const currentItem = ref();
+const loginUser = ref<UserType>();
 
 //展示对话框
 const showModal = (item) => {
   open.value = true;
   currentItem.value = item;
-  console.log("现在:",item);
 };
 
 const submit = async () => {
   open.value = false;
-  message.success("拨打成功!");
-}
+  const data = ({
+    userId: loginUser.value?.id,
+    username: loginUser.value?.username,
+    address: loginUser.value?.address,
+    workerId: currentItem.value?.workerId,
+    workerName: currentItem.value?.username,
+    phone: loginUser.value?.phone,
 
+  });
+  console.log("user:",loginUser.value);
+  console.log("data:",data);
+  const res = await myAxios.post("/emergency/add",data);
+  if (res.code === 0) {
+    message.success("拨打成功!");
+  } else {
+    message.error("拨打失败，请稍后重试");
+  }
+
+}
 
 // 紧急联系人，颜色#722ed1,#52c41a,#1890ff
 const emergencyContacts = ref([]);
 
 
 onMounted(async () => {
+  loginUser.value = await getCurrentUser();
   const res = await myAxios.get("/appointment/emergency");
   if (res.code === 0) {
-    console.log("数据:",res.data);
+    // console.log("数据:",res.data);
     emergencyContacts.value = res.data;
 
     if (emergencyContacts.value.length === 0) {
@@ -89,8 +108,8 @@ onMounted(async () => {
     } else {
       //map方法会立即返回一个新的数组，而不会等待其中的异步操作完成。
       //因此，emergencyContacts.value 会是一个 Promise 对象的数组，而不是你期望的映射后的数据。
-      emergencyContacts.value = await Promise.all(emergencyContacts.value.map(async (item) => {
-        console.log("item:", item);
+      const temp = await Promise.all(emergencyContacts.value.map(async (item) => {
+        // console.log("item:", item);
         const res2 = await myAxios.get('/user/search', {
           params: {
             userId: item.workerId,
@@ -99,15 +118,25 @@ onMounted(async () => {
         if (res2.code === 0) {
           const user = res2.data;
           return {
-            id: item.id,
+            workerId: item.workerId,
             username: item.username,
             phone: user.phone,
             avatar: user.avatarUrl ? user.avatarUrl : '',
             color: '#1890ff',
+
           }
         }
       }));
-      console.log("111:",emergencyContacts.value);
+      //防止重复
+      emergencyContacts.value = [];
+      const set = new Set();
+      temp.forEach((item) => {
+        if (!set.has(item.workerId)) {
+          set.add(item.workerId);
+          emergencyContacts.value.push(item);
+        }
+      });
+      // console.log("数据:",emergencyContacts.value);
     }
   }
 });

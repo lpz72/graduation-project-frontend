@@ -5,21 +5,22 @@ import { UserType } from "@/models/user";
  */
 export type HealthRecordType = {
   id: number;
-  user: UserType
-  // userId: number;
-  // username: string;
-  // idNumber: string;
-  // gender: number;
-  // age: number;
-  // phone: string;
+  username: string;
+  idNumber: string;
+  gender: number;
+  age: number;
+  phone: string;
+  //眼科
   leftEye: number;
   rightEye: number;
   colorVision: string;
+  //五官科
   leftEar: number;
   rightEar: number;
   smell: string;
   stuttering: string;
   faceCondition: string;
+  //内科
   heartRate: number;
   breathingRate: number;
   temperature: number;
@@ -28,6 +29,7 @@ export type HealthRecordType = {
   liver: string;
   spleen: string;
   lung: string;
+  //外科
   height: number;
   weight: number;
   skin: string;
@@ -43,4 +45,4 @@ export type HealthRecordType = {
   doctor: string;
   institution: string;
   isDelete: number;
-}
+};

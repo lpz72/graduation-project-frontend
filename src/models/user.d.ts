@@ -11,6 +11,7 @@ export type UserType = {
   avatarUrl: string;
   gender: number;
   email: string;
+  address: string;
   phone: string;
   userStatus: number;
   department: string;

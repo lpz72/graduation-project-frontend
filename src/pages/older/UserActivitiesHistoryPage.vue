@@ -100,8 +100,9 @@ const getData = async () => {
           activityId: item.activityId,
         }
       });
+      console.log("数据:",data.value);
     }
-    console.log("数据:",data.value);
+
   } else {
     message.error("数据获取失败，请稍后重试")
   }
@@ -124,6 +125,7 @@ const cancel = async () => {
   console.log("取消预约:",currentRecord.value);
   const res = await myAxios.get('/activities/cancel', {
     params: {
+      userId: loginUser.value?.id,
       activityId: currentRecord.value?.activityId,
     }
   });

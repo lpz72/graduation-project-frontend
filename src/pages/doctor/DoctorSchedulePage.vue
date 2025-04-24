@@ -2,14 +2,14 @@
   <div id="nurseSchedulePage" style="margin-top: 10px">
     <a-form>
       <a-form-item
-      label="选择日期:"
+        label="选择日期:"
       >
         <a-date-picker v-model:value="time" />
         <a-button style="margin-left: 10px" type="primary" @click="selectByDate">开始查询</a-button>
       </a-form-item>
     </a-form>
 
-<!--    展示排班信息 -->
+    <!--    展示排班信息 -->
     <div class="nurse-schedule">
       <a-table :columns="columns" :data-source="data">
         <template #bodyCell="{ column, record }">
@@ -18,6 +18,15 @@
           </template>
           <template v-if="column.key === 'endTime'">
             {{new Date(record.endTime).toLocaleString()}}
+          </template>
+          <template v-if="column.key === 'fee'">
+            {{record.fee}}元
+          </template>
+          <template v-if="column.key === 'numberType'">
+            <span>
+              <a-tag v-if="record.numberType === '普通号'" color="#2db7f5">普通号</a-tag>
+              <a-tag v-if="record.numberType === '专家号'" color="#87d068">专家号</a-tag>
+            </span>
           </template>
           <template v-if="column.key === 'category'">
             <span>
@@ -56,6 +65,31 @@ const columns = [
     key: 'department',
   },
   {
+    title: '职称',
+    dataIndex: 'position',
+    key: 'position',
+  },
+  {
+    title: '可预约人数',
+    dataIndex: 'maxCount',
+    key: 'maxCount',
+  },
+  {
+    title: '预约费用',
+    dataIndex: 'fee',
+    key: 'fee',
+  },
+  {
+    title: '号型',
+    dataIndex: 'numberType',
+    key: 'numberType',
+  },
+  {
+    title: '工作方式',
+    dataIndex: 'way',
+    key: 'way',
+  },
+  {
     title: '开始时间',
     dataIndex: 'startTime',
     key: 'startTime',
@@ -64,11 +98,6 @@ const columns = [
     title: '结束时间',
     dataIndex: 'endTime',
     key: 'endTime',
-  },
-  {
-    title: '工作类型',
-    dataIndex: 'way',
-    key: 'way',
   },
   {
     title: '班次',

@@ -1,41 +1,61 @@
 <template>
-  <div class="MedicalCheckRecordPage">
-    <a-table
-      v-if="data.length > 0"
-      :columns="columns"
-      :data-source="data"
-      :row-key="getRowKey"
-    >
-
-      <!-- 自定义单元格 -->
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'createTime'">
-          {{ new Date(record.createTime).toLocaleString() }}
-        </template>
-        <template v-if="column.key === 'doctor'">
-          <a>{{ record.doctor }}</a>
-        </template>
-
-        <template v-else-if="column.key === 'healthCondition'">
-          <a-tag v-if="record.healthCondition === 0" :color="'green'">优秀</a-tag>
-          <a-tag v-if="record.healthCondition === 1" :color="'blue'">良好</a-tag>
-          <a-tag v-if="record.healthCondition === 2" :color="'orange'">一般</a-tag>
-          <a-tag v-if="record.healthCondition === 3" :color="'red'">不良</a-tag>
-        </template>
-
-        <template v-else-if="column.key === 'action'">
-          <a-button type="link" @click="showDetail(record)">
+    <div class="card-layout-container">
+      <!-- 搜索区 -->
+      <a-card title="患者体检报告查询" class="search-card">
+        <a-form layout="inline">
+          <a-form-item label="患者姓名">
+            <a-input v-model:value="searchParams.username" placeholder="输入姓名"/>
+          </a-form-item>
+          <a-form-item label="身份证号">
+            <a-input v-model:value="searchParams.idNumber" placeholder="输入身份证号"/>
+          </a-form-item>
+          <a-button type="primary" html-type="submit" :loading="searchLoading" @click="handleSearch">
             <template #icon>
-              <eye-outlined/>
+              <search-outlined />
             </template>
-            详情
+            查询
           </a-button>
-        </template>
-      </template>
-    </a-table>
-  </div>
+        </a-form>
+      </a-card>
 
-  <!-- 报告具体内容 -->
+      <div class="table-container">
+        <a-table
+          :columns="columns"
+          :data-source="formData"
+          :row-key="record => record.id"
+          :loading="loading"
+          bordered
+        >
+          <!-- 自定义单元格 -->
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'createTime'">
+              {{ new Date(record.createTime).toLocaleString() }}
+            </template>
+            <template v-if="column.key === 'username'">
+              <a>{{ record.username }}</a>
+            </template>
+
+            <template v-else-if="column.key === 'healthCondition'">
+              <a-tag v-if="record.healthCondition === 0" :color="'green'">优秀</a-tag>
+              <a-tag v-if="record.healthCondition === 1" :color="'blue'">良好</a-tag>
+              <a-tag v-if="record.healthCondition === 2" :color="'orange'">一般</a-tag>
+              <a-tag v-if="record.healthCondition === 3" :color="'red'">不良</a-tag>
+            </template>
+
+            <template v-else-if="column.key === 'action'">
+              <a-button type="link" @click="showDetail(record)">
+                <template #icon>
+                  <eye-outlined/>
+                </template>
+                详情
+              </a-button>
+            </template>
+          </template>
+        </a-table>
+      </div>
+
+</div>
+<!-- 报告具体内容 -->
   <div class="detail-content" >
     <a-modal v-model:open="detailVisible" @ok="close" style="width: 80%;height: 300px">
       <a-tabs>
@@ -52,9 +72,9 @@
         <!-- 眼科 -->
         <a-tab-pane key="eye" tab="眼科">
           <a-descriptions :column="2" bordered>
-            <a-descriptions-item label="左眼视力">{{ currentReport.leftEye }}</a-descriptions-item>
-            <a-descriptions-item label="右眼视力">{{ currentReport.rightEye }}</a-descriptions-item>
-            <a-descriptions-item label="色觉">{{ currentReport.colorVision }}</a-descriptions-item>
+          <a-descriptions-item label="左眼视力">{{ currentReport.leftEye }}</a-descriptions-item>
+          <a-descriptions-item label="右眼视力">{{ currentReport.rightEye }}</a-descriptions-item>
+          <a-descriptions-item label="色觉">{{ currentReport.colorVision }}</a-descriptions-item>
           </a-descriptions>
         </a-tab-pane>
 
@@ -110,45 +130,52 @@
       </a-tabs>
     </a-modal>
   </div>
+
 </template>
 
-<script lang="ts" setup>
-import { onMounted, ref } from "vue";
+<script setup lang="ts">
+
+import { ref } from 'vue';
+import { SearchOutlined, EyeOutlined } from '@ant-design/icons-vue';
 import myAxios from "@/plugins/myAxios";
-import { UserType } from "@/models/user";
-import { getCurrentUser } from "@/services/user";
-import { ClockCircleOutlined, EyeOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 import { HealthRecordType } from "@/models/healthRecord";
 
+// 体检报告数据
+const formData = ref([]);
+
+const searchParams = ref({
+  username: '',
+  idNumber: ''
+});
+const searchLoading = ref(false);
 const currentReport = ref<HealthRecordType>();
 const detailVisible = ref(false);
 
-const gender = ref();
-// 表格列配置
 const columns = [
   {
-    title: "体检编号",
-    dataIndex: "id",
-    key: "id",
-    fixed: true,
-  },
-  {
-    title: "体检日期",
-    dataIndex: "createTime",
-    key: "createTime",
+    title: '体检日期',
+    dataIndex: 'createTime',
+    key: 'createTime',
+    // width: 120,
     sorter: {
       compare: (a, b) => new Date(a.createTime) - new Date(b.createTime),
     },
   },
   {
-    title: "体检医生",
-    dataIndex: "doctor",
-    key: "doctor",
+    title: '患者姓名',
+    dataIndex: 'username',
+    key: 'username',
   },
   {
-    title: "健康状况",
-    dataIndex: "healthCondition",
-    key: "healthCondition",
+    title: '年龄',
+    dataIndex: 'age',
+    key: 'age',
+  },
+  {
+    title: '健康状况',
+    dataIndex: 'healthCondition',
+    key: 'healthCondition',
     filters: [
       { text: '优秀', value: 0 },
       { text: '良好', value: 1 },
@@ -158,47 +185,32 @@ const columns = [
     onFilter: (value, record) => record.healthCondition === value
   },
   {
-    title: "体检机构",
-    dataIndex: "institution",
-    key: "institution",
-  },
-  {
-    title: "操作",
-    dataIndex: "action",
-    key: "action",
-  },
+    title: '操作',
+    key: 'action',
+  }
 ];
 
-// 体检报告数据
-const data = ref([]);
+// 点击查询
+const handleSearch = async () => {
+  searchLoading.value = true;
+  setTimeout(() => {
+    searchLoading.value = false;
+  }, 500);
 
-
-/**
- * 使用data数组下标来区分不同行
- * @param record
- */
-const getRowKey = (record) => {
-  return data.value.indexOf(record);
-};
-const loginUser = ref<UserType>();
-onMounted(async () => {
-
-  loginUser.value = await getCurrentUser();
-  const res = await myAxios.get("/health/list",{
+  const res = await myAxios.get("/health/search",{
     params: {
-      idNumber: loginUser.value?.idNumber,
+      username: searchParams.value.username,
+      idNumber: searchParams.value.idNumber,
     }
   });
   if (res.code === 0) {
-    data.value = res.data;
-    for (let i = 0;i < data.value.length; i++) {
-      // const key = data.value[i].doctor;
-      const time = new Date(data.value[i].createTime).toLocaleString();
-      data.value[i].createTime = time;
-    }
-    gender.value = loginUser.value?.gender === 0 ? '男' : '女';
+    formData.value = res.data;
+    message.success("查询成功，结果如下")
+  } else {
+    message.error("查询失败，请刷新后重试")
   }
-});
+
+};
 
 //展示报告详情
 const showDetail = (report: HealthRecord) => {
@@ -218,7 +230,36 @@ function getHealthCondition(id: number) {
   else return '不良'
 
 }
+
+
 </script>
 
 <style scoped>
+  .card-layout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .search-card {
+    margin-bottom: 24px;
+  }
+
+
+  .info-detail h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1890ff;
+  }
+
+  .info-detail p {
+    margin: 4px 0;
+    color: #666;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
 </style>

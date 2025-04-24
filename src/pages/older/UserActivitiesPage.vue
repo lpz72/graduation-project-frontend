@@ -35,6 +35,7 @@ import myAxios from "@/plugins/myAxios";
 import { message } from "ant-design-vue";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
+import { JoinActivity } from "@/models/joinActivity";
 
 const activities = ref([]);
 const loginUser = ref<UserType>();
@@ -94,13 +95,17 @@ const submit = async () => {
     return;
   }
 
-  const res = await myAxios.get("/activities/add", {
-    params: {
-      userId: loginUser.value?.id,
-      activityId: currentActivity.value.id,
-      type: 0,
-    }
+  const data = ({
+    userId: loginUser.value?.id,
+    activityId: currentActivity.value.id,
+    startTime: currentActivity.value.startTime,
+    endTime: currentActivity.value.endTime,
+    type: 0,
   });
+
+
+
+  const res = await myAxios.post("/activities/add", data);
 
   if (res.code === 0) {
     currentActivity.value.status = 1;

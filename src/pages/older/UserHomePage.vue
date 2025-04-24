@@ -30,7 +30,7 @@
             <a-menu-item key="8">
               <router-link to="/user/appointment/doctor" />
               <ScheduleOutlined />
-              <span>预约挂号</span>
+              <span>预约医护人员</span>
             </a-menu-item>
             <a-menu-item key="9">
               <router-link to="/user/appointment/history" />

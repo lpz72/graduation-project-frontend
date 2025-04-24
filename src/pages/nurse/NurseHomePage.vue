@@ -23,6 +23,21 @@
           <ProfileOutlined />
           <span>护理记录</span>
         </a-menu-item>
+        <a-sub-menu key="5" title="活动信息">
+          <template #icon>
+            <NotificationOutlined />
+          </template>
+          <a-menu-item key="6">
+            <router-link to="/nurse/activities/join" />
+            <NotificationOutlined />
+            <span>参加活动</span>
+          </a-menu-item>
+          <a-menu-item key="7">
+            <router-link to="/nurse/activities/history" />
+            <NotificationOutlined />
+            <span>已报名活动</span>
+          </a-menu-item>
+        </a-sub-menu>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -91,6 +106,8 @@ const routeToKeyMap = {
   '/nurse/schedule': '2',
   '/nurse/appointment': '3',
   '/nurse/record': '4',
+  '/nurse/activities/join': '6',
+  '/nurse/activities/history': '7',
 } as const;
 type RoutePath = keyof typeof routeToKeyMap; //指定其类型
 
