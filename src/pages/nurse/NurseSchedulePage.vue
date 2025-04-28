@@ -25,6 +25,7 @@
               <a-tag v-if="record.category === 1" :color="'cyan'">中班</a-tag>
               <a-tag v-if="record.category === 2" :color="'blue'">晚班</a-tag>
               <a-tag v-if="record.category === 3" :color="'purple'">全天</a-tag>
+              <a-tag v-if="record.category === 4" :color="'green'">休息</a-tag>
             </span>
           </template>
         </template>

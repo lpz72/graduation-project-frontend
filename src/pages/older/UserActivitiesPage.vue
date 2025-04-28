@@ -24,6 +24,7 @@
       </a-card>
     </a-col>
   </a-row>
+  <a-empty  v-if="activities.length === 0" :image="simpleImage" description="暂无数据" style="margin-top: 100px" />
 </template>
 
 <script setup lang="ts">
@@ -32,11 +33,12 @@ import picture from "@/assets/活动.png";
 
 import { onMounted, ref } from "vue";
 import myAxios from "@/plugins/myAxios";
-import { message } from "ant-design-vue";
+import { Empty, message } from "ant-design-vue";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
 import { JoinActivity } from "@/models/joinActivity";
 
+const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 const activities = ref([]);
 const loginUser = ref<UserType>();
 const open = ref<boolean>(false);

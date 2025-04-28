@@ -1,4 +1,3 @@
-import LoginPage from "@/layouts/LoginPage.vue";
 import RegisterPage from "@/layouts/RegisterPage.vue";
 import UserHomePage from "@/pages/older/UserHomePage.vue";
 import AdminHomePage from "@/pages/admin/AdminHomePage.vue";
@@ -26,13 +25,39 @@ import DoctorEditCheckRecordPage from "@/pages/doctor/DoctorEditCheckRecordPage.
 import DoctorSelectCheckRecordPage from "@/pages/doctor/DoctorSelectCheckRecordPage.vue";
 import DoctorEditMedicalRecordPage from "@/pages/doctor/DoctorEditMedicalRecordPage.vue";
 import DoctorEmergencyHistoryPage from "@/pages/doctor/DoctorEmergencyHistoryPage.vue";
+import AdminUsersPage from "@/pages/admin/AdminUsersPage.vue";
+import AdminNursesPage from "@/pages/admin/AdminNursesPage.vue";
+import AdminDoctorsPage from "@/pages/admin/AdminDoctorsPage.vue";
+import AdminSchedulesPage from "@/pages/admin/AdminSchedulesPage.vue";
+import AdminNewsPage from "@/pages/admin/AdminNewsPage.vue";
+import AdminActivitiesPage from "@/pages/admin/AdminActivitiesPage.vue";
+import HomeActivitiesPage from "@/layouts/HomeActivitiesPage.vue";
+import HomeNewsPage from "@/layouts/HomeNewsPage.vue";
+import HomePage from "@/layouts/HomePage.vue";
+import BeginPage from "@/layouts/BeginPage.vue";
+import AdminRegisterApplyPage from "@/pages/admin/AdminRegisterApplyPage.vue";
 
 //定义一些路由
 //name相当于key，不能重复
 const routes: Array<RouteRecordRaw> = [
-    { path: '/', name: "首页登录", component: LoginPage }, //默认路由
+    { path: '/', name: "首页登录", component: BeginPage ,
+    children: [
+        { path: '/home',name: "首页", component: HomePage},
+        { path: '/news',name: "首页资讯", component: HomeNewsPage},
+        { path: '/activities',name: "首页活动", component: HomeActivitiesPage},
+    ]}, //默认路由
     { path: '/register',name: "注册", component: RegisterPage},
-    { path: '/admin', name: "管理员首页", component: AdminHomePage },
+
+    { path: '/admin', name: "管理员首页", component: AdminHomePage,
+    children: [
+        { path: '/admin/users', name: "管理员老人账号列表", component: AdminUsersPage},
+        { path: '/admin/nurses', name: "管理员护士账号列表", component: AdminNursesPage},
+        { path: '/admin/doctors', name: "管理员医生账号列表", component: AdminDoctorsPage},
+        { path: '/admin/apply', name: "管理员注册申请管理", component: AdminRegisterApplyPage},
+        { path: '/admin/schedules', name: "管理员排班信息管理", component: AdminSchedulesPage},
+        { path: '/admin/news', name: "管理员资讯管理", component: AdminNewsPage},
+        { path: '/admin/activities', name: "管理员活动管理", component: AdminActivitiesPage},
+    ]},
     { path: '/user', name: "老人首页", component: UserHomePage,
     children: [
         { path: '/user/information', name: "老人个人信息", component: UserInformationPage},

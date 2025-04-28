@@ -1,7 +1,6 @@
 <template>
   <div class="MedicalCheckRecordPage">
     <a-table
-      v-if="data.length > 0"
       :columns="columns"
       :data-source="data"
       :row-key="getRowKey"

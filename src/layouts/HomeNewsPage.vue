@@ -1,8 +1,5 @@
 <template>
   <div class="news-list-container" v-if="news.length > 0">
-<!--    <div>-->
-<!--      <img src="../../assets/健康资讯.png" style="width: 100%;height: 100px;margin-bottom: 20px">-->
-<!--    </div>-->
     <a-collapse v-model:activeKey="activeKey" accordion>
       <a-collapse-panel
         v-for="(item, index) in news"
@@ -38,7 +35,7 @@
       </a-collapse-panel>
     </a-collapse>
   </div>
-  <a-empty  v-if="news.length === 0" :image="simpleImage" description="暂无数据" style="margin-top: 100px" />
+  <a-empty class="empty" v-if="news.length === 0" :image="simpleImage" description="暂无数据" />
 </template>
 
 <script setup lang="ts">
@@ -87,8 +84,16 @@ const addCount = async (id: number,key: string) => {
 </script>
 
 <style scoped>
+
+.empty {
+  margin-left: 600px;
+  margin-top: 225px;
+}
+
 .news-list-container {
   padding: 20px;
+  width: 100%;
+  height: 100%;
 }
 
 .news-panel {

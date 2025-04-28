@@ -194,16 +194,18 @@ const getSchedule = async (val:string,date:Dayjs,val2:number) => {
       });
 
       sortedSchedules.forEach(schedule => {
-        doctorInfo.schedule.push({
-          id: schedule.id,
-          timeRange: formatTimeRange(schedule.startTime, schedule.endTime),
-          startTime: schedule.startTime,
-          isAppointment: 0, //0：预约 1：已预约
-          numberType: schedule.numberType,
-          peopleCount: schedule.peopleCount,
-          way: schedule.way,
-          fee: schedule.fee,
-        });
+        if (schedule.category !== 4) {
+          doctorInfo.schedule.push({
+            id: schedule.id,
+            timeRange: formatTimeRange(schedule.startTime, schedule.endTime),
+            startTime: schedule.startTime,
+            isAppointment: 0, //0：预约 1：已预约
+            numberType: schedule.numberType,
+            peopleCount: schedule.peopleCount,
+            way: schedule.way,
+            fee: schedule.fee,
+          });
+        }
       });
       return doctorInfo;
     });

@@ -30,8 +30,9 @@ myAxios.interceptors.response.use(
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么
     //如果没登录，则跳转到登录页,登录后跳转到之前的页面
-    if (response.data.code === 40100) {
-      const redirectUrl = window.location.href;
+    const redirectUrl = window.location.href;
+    const pathname = window.location.pathname;
+    if (response.data.code === 40100 && pathname !== '/home' && pathname !== '/news' && pathname !== '/activities') {
       window.location.href = "/?redirect=" + redirectUrl;
     }
 

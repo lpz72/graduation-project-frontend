@@ -1,7 +1,6 @@
 <template>
   <div class="MedicalRecordPage">
     <a-table
-      v-if="data.length > 0"
       :columns="columns"
       :data-source="data"
       :expand-column-width="100"
