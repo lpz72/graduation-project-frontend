@@ -56,6 +56,9 @@
             <template v-if="column.key === 'endTime'">
               {{new Date(record.endTime).toLocaleString()}}
             </template>
+            <template v-if="column.key === 'week'">
+              <a> {{options5Map.get(record.week)}} </a>
+            </template>
             <template v-if="column.key === 'category'">
             <span>
               <a-tag v-if="record.category === 0" :color="'processing'">早班</a-tag>
@@ -153,6 +156,17 @@
                          placeholder="请选择结束时间"/>
         </a-form-item>
         <a-form-item
+          label="周次"
+          name="week"
+          :rules="[{ required: true, message: '请选择周次' }]"
+        >
+          <a-select
+            v-model:value="form.week"
+            placeholder="请选择周次"
+            :options="options5"
+          ></a-select>
+        </a-form-item>
+        <a-form-item
           label="班次"
           name="category"
           :rules="[{ required: true, message: '请选择班次' }]"
@@ -203,6 +217,18 @@ const options4 = ref<SelectProps['options']>([
   {value: 3,label: '全天'},
   {value: 4,label: '休息'},
 ])
+
+const options5 = ref<SelectProps['options']>([
+  {value: 1,label: '周一'},
+  {value: 2,label: '周二'},
+  {value: 3,label: '周三'},
+  {value: 4,label: '周四'},
+  {value: 5,label: '周五'},
+  {value: 6,label: '周六'},
+  {value: 7,label: '周日'},
+])
+const options5Map = new Map(options5.value.map((item) => [item.value, item.label]));
+
 const value1 = ref();
 const value2 = ref();
 const currentRecord = ref();
@@ -221,8 +247,10 @@ const init = ref({
   maxCount: undefined,
   endTime: '',
   startTime: '',
+  week: '',
   category: undefined,
   department: '',
+  position: '',
 })
 
 //数据
@@ -261,6 +289,7 @@ const columns = ref([
 // 子列定义
 const innerColumns = [
   // { title: 'id', dataIndex: 'id', key: 'id' },
+  { title: '周次', dataIndex: 'week', key: 'week' },
   { title: '姓名', dataIndex: 'username', key: 'username' },
   // { title: '科室', dataIndex: 'department', key: 'department' },
   // { title: '只为', dataIndex: 'department', key: 'department' },
@@ -270,6 +299,7 @@ const innerColumns = [
   { title: '最大预约人数', dataIndex: 'maxCount', key: 'maxCount' },
   { title: '开始时间', dataIndex: 'startTime', key: 'startTime' },
   { title: '结束时间', dataIndex: 'endTime', key: 'endTime' },
+
   { title: '班次', dataIndex: 'category', key: 'category' },
   {
     title: '操作',
@@ -285,6 +315,7 @@ const showModal = (record) => {
   form.value.workerId = record.id;
   form.value.type = record.userRole === 2 ? 1 : 0;
   form.value.department = record.department;
+  form.value.position = record.position;
   type = 0;
   open.value = true;
 }

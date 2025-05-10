@@ -20,4 +20,5 @@ export type InformationType = {
   otherDiseases: string;
   isDelete: number;
   createTime: Date;
+  tags: string[];
 };

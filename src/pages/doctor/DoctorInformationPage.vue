@@ -129,10 +129,14 @@
 
 import { ref, onMounted } from "vue";
 import myAxios from "@/plugins/myAxios";
-import {  message, SelectProps } from "ant-design-vue";
+import { message, SelectProps } from "ant-design-vue";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
+const nowTotal = ref();
+import { notification } from 'ant-design-vue';
+import { draftStore } from "@/stores/draftStore";
 
+const {load,save,clear} = draftStore();
 const loginUser = ref<UserType>();
 const options = ref<SelectProps['options']>([
   {value: '皮肤科',label: '皮肤科'},
@@ -146,6 +150,24 @@ const gender = ref<SelectProps['options']>([
 onMounted(async () => {
   //获取当前用户
   loginUser.value = await getCurrentUser();
+  await getEmergency();
+  if (loginUser.value) {
+    const userId = String(loginUser.value.id);
+    const sum = load(userId);
+    if (sum === null) {
+      save(userId,nowTotal.value);
+    } else {
+      if(nowTotal.value > sum) {
+        save(userId,nowTotal.value);
+        notification['warning']({
+          message: '紧急呼救',
+          description:
+            '有新的紧急呼救，请马上查看',
+        });
+      }
+    }
+  }
+
   // message.success(loginUser.value?.userPassword);
 })
 
@@ -161,6 +183,19 @@ const handleSubmit = async () => {
     message.error(res.description);
   }
 };
+
+const getEmergency = async () => {
+  const res = await myAxios.get("/emergency/list",{
+    params: {
+      workerId: loginUser.value?.id,
+    }
+  });
+  if (res.code === 0) {
+    nowTotal.value = res.data.length;
+  } else {
+    message.error("数据获取失败，请稍后重试");
+  }
+}
 </script>
 
 <style scoped>

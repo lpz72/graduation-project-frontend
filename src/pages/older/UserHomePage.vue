@@ -8,11 +8,14 @@
         <user-outlined />
         <span>健康信息</span>
       </a-menu-item>
-        <a-menu-item key="2">
+<!--
+ <a-menu-item key="2">
           <router-link to="/user/news" />
           <ContainerOutlined />
           <span>健康资讯</span>
         </a-menu-item>
+-->
+
         <a-menu-item key="3">
           <router-link to="/user/record" />
           <HistoryOutlined />

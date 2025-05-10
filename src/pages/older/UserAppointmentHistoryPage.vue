@@ -8,9 +8,13 @@
         <a-tag v-if="record.category === 0" :color="'geekblue'">医生</a-tag>
         <a-tag v-else-if="record.category === 1" :color="'green'">护士</a-tag>
       </template>
+      <template v-if="column.key === 'time'">
+        <a>{{record.time}}</a>
+      </template>
       <template v-else-if="column.key === 'type'">
         <a-button v-if="record.type === 0" type="primary" @click="showModal(record)">取消预约</a-button>
         <a-button v-else-if="record.type === 1" type="primary" disabled>已退号</a-button>
+        <a-button v-else-if="record.type === 2" type="primary" >已就诊</a-button>
         <a-modal v-model:open="open" title="是否确认取消预约" @ok="cancel" />
       </template>
     </template>
@@ -24,6 +28,8 @@ import myAxios from "@/plugins/myAxios";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
 import { message } from "ant-design-vue";
+const map = new Map([[1,'周一'],[2,'周二'],[3,'周三'],[4,'周四'],[5,'周五'],[6,'周六'],[7,'周日']])
+
 
 const columns = [
   {

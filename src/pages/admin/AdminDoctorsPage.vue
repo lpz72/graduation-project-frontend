@@ -100,7 +100,7 @@ const confirm = async () => {
 const getData = async () => {
   const res = await myAxios.get("/user/list",{
     params: {
-      type: 1,
+      type: 3,
     }
   });
 

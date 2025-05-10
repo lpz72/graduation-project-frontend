@@ -123,7 +123,7 @@ const doMenuClick = ({ key }: { key: string }) => {
 
 .content {
   flex: 1;
-  padding: 24px;
+  padding: 20px;
   background: #f0f2f5;
 }
 /*
@@ -135,7 +135,7 @@ const doMenuClick = ({ key }: { key: string }) => {
 }*/
 
 .main-content {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   display: flex;
   gap: 24px;

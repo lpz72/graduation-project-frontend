@@ -16,6 +16,9 @@
           <template v-if="column.key === 'startTime'">
             {{new Date(record.startTime).toLocaleString()}}
           </template>
+          <template v-if="column.key === 'week'">
+            <a>{{map.get(record.week)}}</a>
+          </template>
           <template v-if="column.key === 'endTime'">
             {{new Date(record.endTime).toLocaleString()}}
           </template>
@@ -42,10 +45,17 @@ import myAxios from "@/plugins/myAxios";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
 import { message } from "ant-design-vue";
+const map = new Map([[1,'周一'],[2,'周二'],[3,'周三'],[4,'周四'],[5,'周五'],[6,'周六'],[7,'周日']])
+
 
 const time = ref<Dayjs>();
 
 const columns = [
+  {
+    title: '周次',
+    dataIndex: 'week',
+    key: 'week',
+  },
   {
     title: '姓名',
     dataIndex: 'username',

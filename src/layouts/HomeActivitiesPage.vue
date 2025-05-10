@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-  <a-list v-if="activities.length > 0" :grid="{ gutter: 16, column: 4 }" :data-source="activities">
+  <a-list v-if="activities.length > 0" :grid="{ gutter: 15, column: 2 }" :data-source="activities">
     <template #renderItem="{ item }">
       <a-list-item>
         <a-card hoverable class="activity-card">
@@ -11,6 +11,9 @@
             <template #description>
               <div class="activity-info">
                 <p class="dept-title">类型: {{ item.type }}</p>
+                <p class="dept-title">主题:
+                  <a-tag  v-for="tags in item.tags" :color="'cyan'" size="small">{{tags}}</a-tag>
+                </p>
                 <p class="people">参与人数: {{ item.currentCount }}/{{ item.peopleCount }}</p>
                 <p class="time">时间: {{ new Date(item.startTime).toLocaleString() }} - {{ new Date(item.endTime).toLocaleString() }}</p>
                 <p class="position">地点: {{ item.position }}</p>
@@ -50,6 +53,9 @@ const currentActivity = ref();
 onMounted(async () => {
   const res = await myAxios.get("/activities/list");
   if (res.code === 0) {
+    res.data.forEach(item => {
+      item.tags = JSON.parse(item.tags || '["无"]');
+    });
     activities.value = res.data;
 
   } else {
@@ -87,7 +93,8 @@ const join = async () => {
   cursor: pointer;
   transition: all 0.3s;
   width: 100%;
-  height: 320px;
+  height: 350px;
+  position: relative; /* 父容器设置为相对定位 */
   /*height: 100%;
 
    */
@@ -122,13 +129,17 @@ const join = async () => {
 
 .activity-info .position {
   color: #666;
-  margin-bottom: 4px;
+  /*margin-bottom: 4px;*/
 }
 .activity-info .time {
   color: #666;
   margin-bottom: 4px;
 }
+
 .activity-info .submit {
-  margin-top: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
+
+
 </style>

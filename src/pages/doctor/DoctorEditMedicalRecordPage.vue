@@ -129,7 +129,7 @@ import { SaveOutlined } from "@ant-design/icons-vue";
 import { UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
 import { departments } from "@/constants/departments";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const submitting = ref(false);
 const nurses = ref<SelectProps['options']>([]);
@@ -187,7 +187,13 @@ const init = ref({
 
 onMounted(async () => {
   //解析出数据
-  data.value = JSON.parse(route.query.data);
+  try {
+    data.value = JSON.parse(route.query.data);
+  } catch (error) {
+    message.error("数据获取失败，请返回重试");
+    return;
+  }
+
   loginUser.value = await getCurrentUser();
   form.value = {...init.value};
   // checkDraft();
@@ -266,12 +272,17 @@ const submitReport = async () => {
 
   form.value.doctorId = loginUser.value?.id;
   form.value.doctor = loginUser.value?.username;
-  const nurse = nurses.value?.find(item => item.value === form.value.nurseId);
-  form.value.nurse = nurse.label;
+  if (form.value.nurseId) {
+    const nurse = nurses.value?.find(item => item.value === form.value.nurseId);
+    form.value.nurse = nurse.label;
+  }
 
+
+  const router = useRouter();
   const res1 = await myAxios.post('/medical/add', form.value);
   if (res1.code === 0) {
     message.success('就诊报告提交成功');
+    // await router.push('/doctor/appointment');
     // resetForm();
   } else {
     message.error(res1.message || '提交失败');

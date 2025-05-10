@@ -91,6 +91,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
+
 import {
   UserOutlined,
   MenuUnfoldOutlined,
@@ -111,6 +112,7 @@ const selectedKeys = ref<string[]>([]);
 const collapsed = ref<boolean>(false);
 const router = useRouter();
 const route = useRoute();
+
 
 const loginUser = ref<UserType>();
 // <a-menu-item key="7">
@@ -133,6 +135,7 @@ type RoutePath = keyof typeof routeToKeyMap; //指定其类型
 
 onMounted(async () => {
   loginUser.value = await getCurrentUser();
+
   // console.log("网址：",route.path);
   await router.push(route.path);
   const path = route.path as RoutePath; //进行类型断言
@@ -152,6 +155,7 @@ const logout = async () => {
     });
   }
 }
+
 
 </script>
 

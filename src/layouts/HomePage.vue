@@ -149,7 +149,6 @@
             :rules="[{ required: true, message: '请选择你的身份!' }]"
           >
             <a-select v-model:value="formState2.role" placeholder="请选择你的身份">
-              <a-select-option value="0">管理员</a-select-option>
               <a-select-option value="1">老人</a-select-option>
               <a-select-option value="2">护士</a-select-option>
               <a-select-option value="3">医生</a-select-option>
@@ -179,7 +178,6 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons-vue";
 import banner1 from '@/assets/健康资讯.png';
 import banner2 from '@/assets/健康头条.png';
-import banner3 from '@/assets/活动.png';
 import { useRouter } from "vue-router";
 import { ref, reactive, onMounted } from "vue";
 import myAxios from "@/plugins/myAxios";
@@ -194,7 +192,6 @@ let isLogin = true;
 const banners = ref([
   { id: 1, image: banner1, title: '关注健康，享受生活' },
   { id: 2, image: banner2, title: '专业医疗团队为您服务' },
-  { id: 3, image: banner3, title: '健康讲座每周更新' },
 ]);
 
 // 活动信息
@@ -350,7 +347,7 @@ const showNewsDetail = (item) => {
 
 <style scoped>
 .content {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
     display: flex;
     gap: 24px;
@@ -426,11 +423,13 @@ const showNewsDetail = (item) => {
   flex-direction: column; /* 垂直排列 */
   gap: 24px; /* 子元素间距 */
   overflow: auto;
+  margin-left: 30px;
 
 }
 
 .right-section {
   width: 360px;
+  /*margin-left: 30px;*/
 }
 
 .login-card {

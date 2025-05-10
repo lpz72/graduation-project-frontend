@@ -7,9 +7,11 @@
       placeholder="请选择科室"
       :options="departments"
     ></a-select>
-    <span style="margin-left: 10px">
+<!--
+<span style="margin-left: 10px">
       <a-date-picker v-model:value="time"  :disabled-date="disabledDate"/>
     </span>
+-->
     <span>
       <a-select
         v-model:value="value2"
@@ -60,7 +62,10 @@
         <a-descriptions-item label="所属医院">{{ selectedDoctor.hospital }}</a-descriptions-item>
       </a-descriptions>
 
-      <a-divider orientation="left">排班信息 ({{ selectTime }})</a-divider>
+      <a-divider orientation="left">本周内排班信息
+
+        <a>(信息每周一定时更新)</a>
+      </a-divider>
 
       <a-table
         :columns="scheduleColumns"
@@ -70,6 +75,9 @@
         :loading="loadingSchedules"
       >
         <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'week'">
+            <a >{{map.get(record.week)}}</a>
+          </template>
           <template v-if="column.key === 'action'">
             <a-button v-if="record.isAppointment === 0" type="primary" size="small" @click="showModal(record)">预约</a-button>
             <a-button v-if="record.isAppointment === 1" type="primary" size="small" >已预约</a-button>
@@ -110,6 +118,7 @@ const options2 = ref<SelectProps['options']>([
   {value: '0',label: '医生'},
   {value: '1',label: '护士'},
 ])
+const map = new Map([[1,'周一'],[2,'周二'],[3,'周三'],[4,'周四'],[5,'周五'],[6,'周六'],[7,'周日']])
 
 const doctors = ref([]);
 const finalDoctors = ref([]);
@@ -123,16 +132,16 @@ const loginUser = ref<UserType>();
  * @param val2
  */
 const getSchedule = async (val:string,date:Dayjs,val2:number) => {
-  if(date == null || val == null) {
-    message.error("请选择科室或日期");
+  if(val == null || val2 == null) {
+    message.error("请选择科室或人员类型");
     return;
   }
-  selectTime.value = date.format('YYYY-MM-DD');
+  // selectTime.value = date.format('YYYY-MM-DD');
   loginUser.value = await getCurrentUser();
   const res = await myAxios.get("/appointment/schedule",{
     params: {
       department: val,
-      dateTime: selectTime.value,
+      // dateTime: selectTime.value,
       type: val2
     }
   });
@@ -196,6 +205,7 @@ const getSchedule = async (val:string,date:Dayjs,val2:number) => {
       sortedSchedules.forEach(schedule => {
         if (schedule.category !== 4) {
           doctorInfo.schedule.push({
+            week: schedule.week,
             id: schedule.id,
             timeRange: formatTimeRange(schedule.startTime, schedule.endTime),
             startTime: schedule.startTime,
@@ -220,6 +230,7 @@ const selectedDoctor = ref(null);
 const scheduleVisible = ref(false);
 const loadingSchedules = ref(false);
 const scheduleColumns = [
+  { title: '周次', dataIndex: 'week', key: 'week' },
   { title: '时间段', dataIndex: 'timeRange', key: 'timeRange' },
   { title: '号源类型', dataIndex: 'numberType', key: 'numberType' },
   { title: '剩余号数', dataIndex: 'peopleCount', key: 'peopleCount' },
@@ -245,7 +256,7 @@ const showSchedule = async (doctor) => {
     const appointments = res.data;
     doctor.schedule = doctor.schedule.map((schedule) => {
       const isAppointment = appointments.some(
-        (appointment) => appointment.scheduleId === schedule.id
+        (appointment) => appointment.scheduleId === schedule.id && appointment.type === 0
       );
       return {
         ...schedule,
@@ -255,6 +266,7 @@ const showSchedule = async (doctor) => {
   }
 
   selectedDoctor.value = doctor;
+  console.log("ddd",selectedDoctor.value);
   scheduleVisible.value = true;
   loadingSchedules.value = true;
 
@@ -286,7 +298,9 @@ const handleAppointment = async (schedule, doctor) => {
   let name;
   // if (doctor.type === 0) name = "doctor";
   // else name = "nurse";
-  const time = String(schedule.startTime).substring(0,10) + " " + schedule.timeRange;
+  //根据预约的本周几，获取具体的日期
+  const time = getDateOfWeekDay(schedule.week) + " " + schedule.timeRange;;
+  // const time = String(schedule.startTime).substring(0,10) + " " + schedule.timeRange;
   const res = await myAxios.post('/appointment/add', {
     userId: loginUser.value?.id,
     workerId: doctor.id,
@@ -374,6 +388,30 @@ const disabledDate = (current: Dayjs) => {
 
   return current && current < dayjs().startOf('day');
 };
+
+
+// 获取本周的周几的具体日期
+function getDateOfWeekDay(targetDay) {
+  // 获取当前日期
+  const today = new Date();
+
+  // 获取今天是周几（0 表示周日，1 表示周一，...，6 表示周六）
+  const currentDay = today.getDay();
+
+  // 计算本周的周一
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - currentDay + 1);
+
+  // 计算目标周几的日期
+  const targetDate = new Date(monday);
+  targetDate.setDate(monday.getDate() + targetDay - 1);
+
+  const year = targetDate.getFullYear();
+  const month = String(targetDate.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始，需要加 1
+  const day = String(targetDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
 
 </script>
 

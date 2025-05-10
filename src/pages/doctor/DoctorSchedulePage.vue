@@ -19,6 +19,9 @@
           <template v-if="column.key === 'endTime'">
             {{new Date(record.endTime).toLocaleString()}}
           </template>
+          <template v-if="column.key === 'week'">
+            <a> {{map.get(record.week)}} </a>
+          </template>
           <template v-if="column.key === 'fee'">
             {{record.fee}}元
           </template>
@@ -55,6 +58,11 @@ import { message } from "ant-design-vue";
 const time = ref<Dayjs>();
 
 const columns = [
+  {
+    title: '周次',
+    dataIndex: 'week',
+    key: 'week',
+  },
   {
     title: '姓名',
     dataIndex: 'username',
@@ -109,6 +117,7 @@ const columns = [
 
 const data = ref([]);
 const loginUser = ref<UserType>();
+const map = new Map([[1,'周一'],[2,'周二'],[3,'周三'],[4,'周四'],[5,'周五'],[6,'周六'],[7,'周日']])
 
 onMounted(async () => {
 

@@ -56,6 +56,20 @@
         </a-input>
       </a-form-item>
       <a-form-item
+        label="基础病"
+        name="tags"
+        :rules="[{ required: true, message: '请选择基础病情况' }]"
+      >
+        <a-select
+          v-model:value="form.tags"
+          :options="options"
+          mode="multiple"
+          placeholder="请选择基础病情况"
+          style="width: 100%"
+        ></a-select>
+      </a-form-item>
+
+      <a-form-item
         label="体重(kg)"
         name="weight"
         :rules="[{ required: true, message: '请输入体重(kg)!' }]"
@@ -141,10 +155,24 @@ import { useRouter } from "vue-router";
 import {UserType } from "@/models/user";
 import { getCurrentUser } from "@/services/user";
 import { InformationType } from "@/models/elderHelth";
+import type { SelectProps } from 'ant-design-vue';
 
 const loginUser = ref<UserType>();
 const information = ref<InformationType>();
 const gender = ref();
+
+const options = ref<SelectProps['options']>([
+  { value: '糖尿病', label: '糖尿病', },
+  { value: '高血压', label: '高血压', },
+  { value: '心脏病', label: '心脏病', },
+  { value: '中风', label: '中风', },
+  { value: '骨质疏松', label: '骨质疏松', },
+  { value: '冠心病', label: '冠心病', },
+  { value: '老年性痴呆', label: '老年性痴呆', },
+  { value: '关节炎', label: '关节炎', },
+
+]);
+
 //抽象出一个对象
 const form = ref({
   username: "",
@@ -159,7 +187,7 @@ const form = ref({
   lowBloodPressure: undefined,
   phone: "",
   address: "",
-
+  tags: [],
 })
 
 
@@ -201,6 +229,7 @@ onMounted(async () => {
       height: information.value?.height,
       highBloodPressure: information.value?.highBloodPressure,
       lowBloodPressure: information.value?.lowBloodPressure,
+      tags: JSON.parse(information.value?.tags),//把JSon转换成数组
     })
     form.value = Data.value;
     console.log("form:",form.value);
@@ -234,6 +263,7 @@ const handleSubmit = async () => {
     information.value.height = Number(form.value.height);
     information.value.highBloodPressure = Number(form.value.highBloodPressure);
     information.value.lowBloodPressure = Number(form.value.lowBloodPressure);
+    information.value.tags = form.value.tags;
   }
 
   const res1 = await myAxios.post("/user/update", loginUser.value);

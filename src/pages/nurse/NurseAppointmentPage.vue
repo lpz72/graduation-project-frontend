@@ -12,9 +12,22 @@
     <!--    展示排班信息 -->
     <div class="nurse-schedule">
       <a-table :columns="columns" :data-source="data">
+        <template #bodyCell="{column,record}">
+          <template v-if="column.key === 'action'">
+            <a-button v-if="record.type === 0" type="primary" @click="show(record)">
+              确认处理
+            </a-button>
+            <a-button v-if="record.type === 2" type="primary" >
+              已处理
+            </a-button>
+          </template>
+        </template>
       </a-table>
     </div>
   </div>
+
+  <a-modal v-model:open="open" title="是否确认已处理" @ok="solve"/>
+
 </template>
 
 <script setup lang="ts">
@@ -27,6 +40,8 @@ import { getCurrentUser } from "@/services/user";
 import { message } from "ant-design-vue";
 
 const time = ref<Dayjs>();
+const open = ref(false);
+const currentRecord = ref();
 
 const columns = [
   {
@@ -54,6 +69,11 @@ const columns = [
     title: '预约服务类型',
     dataIndex: 'way',
     key: 'way',
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    key: 'action',
   },
 ];
 
@@ -110,6 +130,29 @@ const selectByDate = async () => {
     message.error("查询失败，请刷新后重试")
   }
 
+}
+
+const show = (record) => {
+  open.value = true;
+  currentRecord.value = record;
+}
+
+/**
+ * 更新改预约信息type
+ */
+const solve = async () => {
+  const res = await myAxios.get("/appointment/update",{
+    params: {
+      id: currentRecord.value.id,
+    }
+  })
+  if (res.code === 0) {
+    message.success("确认成功")
+    currentRecord.value.type = 2;
+    open.value = false;
+  } else {
+    message.error("确认失败，请稍后重试")
+  }
 }
 
 </script>

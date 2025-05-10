@@ -9,6 +9,9 @@
           <template #description>
             <div class="activity-info">
               <p class="dept-title">类型: {{activity.type}}</p>
+              <p class="dept-title">主题:
+                  <a-tag  v-for="tags in activity.tags" :color="'cyan'" size="small">{{tags}}</a-tag>
+              </p>
               <p class="people">参与人数: {{activity.currentCount}}/{{activity.peopleCount}}</p>
               <p class="time">时间: {{new Date(activity.startTime).toLocaleString()}} - {{new Date(activity.endTime).toLocaleString()}}</p>
               <p class="position">地点: {{ activity.position }}</p>
@@ -47,7 +50,7 @@ const currentActivity = ref();
 onMounted(async () => {
   loginUser.value = await getCurrentUser();
 
-  const res = await myAxios.get("/activities/list");
+  const res = await myAxios.get("/activities/recommend");
   if (res.code === 0) {
     activities.value = res.data;
    // const temp = res.data;
@@ -68,6 +71,7 @@ onMounted(async () => {
       const temp = res2.data;
       activities.value = activities.value.map((activity) => {
         const hasJoin = temp.some((data) => activity.id === data.activityId);
+        activity.tags = JSON.parse(activity.tags || '["无"]');
         return {
           status: hasJoin ? 1 : 0,
           ...activity,
@@ -133,7 +137,7 @@ const submit = async () => {
   cursor: pointer;
   transition: all 0.3s;
   width: 270px;
-  height: 320px;
+  height: 350px;
   /*height: 100%;
 
    */

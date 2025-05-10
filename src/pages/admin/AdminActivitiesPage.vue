@@ -24,9 +24,15 @@
       <template v-if="column.key === 'endTime'">
         {{new Date(record.endTime).toLocaleString()}}
       </template>
-      <template v-if="column.key === 'type'">
-        <a-tag  :color="'cyan'">{{record.type}}</a-tag>
+      <template v-if="column.key === 'tags'">
+        <a-space :size="1">
+          <a-tag  v-for="tags in record.tags" :color="'blue'">{{tags}}</a-tag>
+        </a-space>
+
       </template>
+<!--      <template v-if="column.key === 'type'">-->
+<!--        <a-tag  :color="'cyan'">{{record.type}}</a-tag>-->
+<!--      </template>-->
       <template v-if="column.key === 'status'">
         <a-tag  v-if="record.status === 0" color="success">进行中</a-tag>
         <a-tag  v-else color="default">已过期</a-tag>
@@ -66,6 +72,19 @@
           :rules="[{ required: true, message: '请填写活动类型' }]"
         >
           <a-input v-model:value="form.type"  placeholder="请填写活动类型"/>
+        </a-form-item>
+        <a-form-item
+          label="主题"
+          name="tags"
+          :rules="[{ required: true, message: '请选择活动主题' }]"
+        >
+          <a-select
+            v-model:value="form.tags"
+            :options="options"
+            mode="multiple"
+            placeholder="请选择活动主题"
+            style="width: 100%"
+          ></a-select>
         </a-form-item>
         <a-form-item
           label="地点"
@@ -115,8 +134,20 @@
 import { onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import myAxios from "@/plugins/myAxios";
-import { message } from "ant-design-vue";
+import { message, type SelectProps } from "ant-design-vue";
 import { PlusOutlined } from "@ant-design/icons-vue";
+
+const options = ref<SelectProps['options']>([
+  { value: '糖尿病', label: '糖尿病', },
+  { value: '高血压', label: '高血压', },
+  { value: '心脏病', label: '心脏病', },
+  { value: '中风', label: '中风', },
+  { value: '骨质疏松', label: '骨质疏松', },
+  { value: '冠心病', label: '冠心病', },
+  { value: '老年性痴呆', label: '老年性痴呆', },
+  { value: '关节炎', label: '关节炎', },
+
+]);
 
 const columns = ref([
   {
@@ -128,6 +159,12 @@ const columns = ref([
     title: '类型',
     dataIndex: 'type',
     key: 'type'
+  },
+  {
+    title: '主题',
+    dataIndex: 'tags',
+    key: 'tags',
+    width: 150
   },
   {
     title: '地点',
@@ -158,11 +195,13 @@ const columns = ref([
     title: '状态',
     dataIndex: 'status',
     key: 'status',
+    width: 80
   },
   {
     title: '操作',
     dataIndex: 'action',
     key: 'action',
+    width: 170
   }
 
 ]);
@@ -177,6 +216,7 @@ const init = ref({
   startTime: '',
   endTime: '',
   status: '',
+  tags: [],
 });
 
 const data = ref([]);
@@ -193,13 +233,24 @@ const getData = async () => {
   const res = await myAxios.get("/activities/all");
   if (res.code === 0) {
     const date = new Date();
-    data.value = await Promise.all(res.data.map(e => {
+    // data.value = await Promise.all(res.data.map(e => {
+    //   const f = new Date(e.endTime) > date ? 0 : 1;
+    //   e.tags = JSON.parse(e.tags)
+    //   // console.log("e",JSON.parse(e.tags))
+    //   return {
+    //     ...e,
+    //     status: f,
+    //   }
+    // }))
+    data.value = res.data.map(e => {
       const f = new Date(e.endTime) > date ? 0 : 1;
+      e.tags = JSON.parse(e.tags || '["无"]')
+      // console.log("e",JSON.parse(e.tags))
       return {
         ...e,
         status: f,
       }
-    }))
+    })
   } else {
     message.error("数据获取失败，请稍后重试")
   }
